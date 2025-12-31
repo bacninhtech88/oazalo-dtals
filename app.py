@@ -1,6 +1,6 @@
 # app.py
 from fastapi import FastAPI
-from ai_connect import test_chatgpt_connection
+from ai_connect import chatgpt_connection
 
 app = FastAPI()
 
@@ -12,4 +12,4 @@ def health_check():
 
 @app.get("/test-chatgpt")
 def test_chatgpt():
-    return test_chatgpt_connection()
+    return chatgpt_connection()
