@@ -20,6 +20,7 @@ def test_chatgpt():
 def test_zalo():
     return zalo_oa_connection()
 
-@app.get("/zalo_verifierS_JSvNAFNjqAmjigy44dYig.txt")
+@app.get("/zalo_verifierS_-JSvNAFNjqlAmjgiy44dYviGYKpsLLDJ8s.txt")
 def zalo_verify():
-    return PlainTextResponse("JSvNAFNjqAmjigy44dYig")
+
+    return PlainTextResponse("-JSvNAFNjqlAmjgiy44dYviGYKpsLLDJ8s")
