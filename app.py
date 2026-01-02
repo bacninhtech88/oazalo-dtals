@@ -1,5 +1,6 @@
 # app.py
 from fastapi import FastAPI
+from fastapi.responses import PlainTextResponse
 from ai_connect import chatgpt_connection
 from zalo_auth import zalo_oa_connection
 
@@ -18,3 +19,7 @@ def test_chatgpt():
 @app.get("/test-zalo")
 def test_zalo():
     return zalo_oa_connection()
+
+@app.get("/zalo_verifierS_JSvNAFNjqAmjigy44dYig.txt")
+def zalo_verify():
+    return PlainTextResponse("JSvNAFNjqAmjigy44dYig")
