@@ -27,6 +27,11 @@ def test_chatgpt():
 def test_zalo():
     return zalo_oa_connection()
 
+@app.post("/webhook")
+async def zalo_webhook(request: Request):
+    body = await request.json()
+    print("ZALO WEBHOOK:", body)
+    return {"status": "ok"}
 
 
 
