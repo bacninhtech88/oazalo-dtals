@@ -1,5 +1,5 @@
 # app.py
-from fastapi import FastAPI
+from fastapi import FastAPI , Request
 from fastapi.responses import HTMLResponse
 from ai_connect import chatgpt_connection
 from zalo_auth import zalo_oa_connection
@@ -32,6 +32,7 @@ async def zalo_webhook(request: Request):
     body = await request.json()
     print("ZALO WEBHOOK:", body)
     return {"status": "ok"}
+
 
 
 
