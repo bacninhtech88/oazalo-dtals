@@ -6,11 +6,18 @@ from zalo_auth import zalo_oa_connection
 
 app = FastAPI()
 
-@app.get("/")
-def health_check():
-    return {
-        "status": "Server is running"
-    }
+@app.get("/", response_class=HTMLResponse)
+def home():
+    return """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta property="zalo-platform-site-verification"
+      content="S_-JSvNAFNjqlAmjgiy44dYviGYKpsLLDJ8s" />
+</head>
+<body>
+There Is No Limit To What You Can Accomplish Using Zalo!
+</body>
+</html>"""
 
 @app.get("/test-chatgpt")
 def test_chatgpt():
@@ -20,8 +27,5 @@ def test_chatgpt():
 def test_zalo():
     return zalo_oa_connection()
 
-@app.get("/zalo_verifierS_-JSvNAFNjqlAmjgiy44dYviGYKpsLLDJ8s.html")
-def zalo_verify():
 
-    return PlainTextResponse("-JSvNAFNjqlAmjgiy44dYviGYKpsLLDJ8s")
 
