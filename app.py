@@ -29,10 +29,15 @@ def test_zalo():
 
 @app.post("/webhook")
 async def zalo_webhook(request: Request):
+    # Lấy toàn bộ dữ liệu Zalo gửi sang
     body = await request.json()
-    print("ZALO WEBHOOK:", body)
-    return {"status": "ok"}
 
+    # In ra log để bạn nhìn thấy trên Render
+    print("--- NHẬN ĐƯỢC WEBHOOK ---")
+    print(body)
+    print("--------------------------")
 
+    # Trả về 200 OK ngay lập tức cho Zalo
+    return {"status": "success"}
 
 
