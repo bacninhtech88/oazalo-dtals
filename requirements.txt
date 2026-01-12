@@ -24,3 +24,7 @@ resend
 requests
 
 psycopg2-binary
+
+google-auth-httplib2
+langchain-google-genai
+google-generativeai
