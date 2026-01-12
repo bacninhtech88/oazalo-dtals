@@ -4,6 +4,8 @@ from fastapi.responses import HTMLResponse
 from ai_connect import chatgpt_connection
 from zalo_auth import zalo_oa_connection
 
+from drive_connect import get_vectorstore
+
 app = FastAPI()
 
 @app.get("/", response_class=HTMLResponse)
@@ -41,3 +43,23 @@ async def zalo_webhook(request: Request):
     return {"status": "success"}
 
 
+@app.get("/check-drive")
+async def check_drive():
+    try:
+        # Gọi vectorstore đã được khởi tạo trong drive_connect.py
+        vectorstore = get_vectorstore()
+        
+        # Đếm số lượng mẩu dữ liệu đã học được từ các file PDF/Docx
+        count = vectorstore._collection.count()
+        
+        return {
+            "status": "success",
+            "folder_id": "Đã kết nối", # Có thể lấy từ os.getenv("DRIVE_FOLDER_ID")
+            "total_documents_chunks": count,
+            "message": "Kết nối Google Drive và ChromaDB hoạt động tốt!"
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Lỗi kết nối Drive: {str(e)}"
+        }
