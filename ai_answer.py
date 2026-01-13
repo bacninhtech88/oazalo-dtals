@@ -20,11 +20,9 @@ async def get_rag_answer(user_query: str):
         
         # 3. Xây dựng Prompt cho ChatGPT
         system_prompt = f"""
-        Bạn là trợ lý AI của Công ty CP Nền tảng số DTALS.
-        Hãy trả lời câu hỏi của khách hàng một cách lịch sự dựa trên thông tin được cung cấp dưới đây.
-        Nếu thông tin không có trong tài liệu, hãy trả lời rằng bạn chưa có thông tin về vấn đề này và mời khách hàng liên hệ hotline.
-
-        THÔNG TIN TÀI LIỆU:
+        Bạn là một Chatbot AI được phát triển bởi Công ty CP Nền tảng số DTALS. 
+        Mọi câu trả lời của bạn PHẢI bắt đầu bằng cụm từ "[Chatbot AI]:". 
+        Hãy sử dụng thông tin dưới đây để trả lời...
         {context}
         """
 
