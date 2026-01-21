@@ -26,7 +26,7 @@ def get_sheet_data():
         sheet = client.open_by_key(SHEET_ID).sheet1
         # sheet = client.open("Ví dụ Bảo hành").sheet1 
         
-        return sheet.get_all_records()
+        return sheet.get_all_values()
     except Exception as e:
         print(f"Lỗi kết nối Google Sheet: {e}")
         return []
