@@ -20,10 +20,11 @@ def get_sheet_data():
         creds_json = json.loads(os.getenv("GCP_CREDENTIALS_JSON"))
         creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
         client = gspread.authorize(creds)
-
+        SHEET_ID = "1MPL86dM26ypGQHCDDwN-eCL3kENvg8821dwRS7pYxgI"
         # 3. Mở file theo tên bạn đã đặt trên Drive
         # Thay "Ví dụ Bảo hành" bằng tên file thực tế của bạn
-        sheet = client.open("Ví dụ Bảo hành").sheet1 
+        sheet = client.open_by_key(SHEET_ID).sheet1
+        # sheet = client.open("Ví dụ Bảo hành").sheet1 
         
         return sheet.get_all_records()
     except Exception as e:
