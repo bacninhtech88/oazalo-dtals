@@ -9,6 +9,9 @@ from drive_connect import get_vectorstore
 from ai_answer import get_rag_answer
 from zalo_auth import send_zalo_message
 
+from google_sheet import get_sheet_data  # Import hàm từ file google_sheet.py
+
+
 app = FastAPI()
 
 @app.get("/", response_class=HTMLResponse)
@@ -78,6 +81,24 @@ async def check_drive():
             "message": f"Lỗi kết nối Drive: {str(e)}"
         }
 
+
+@app.get("/check-sheet")
+async def check_sheet_connection():
+    """Endpoint để kiểm tra kết nối và dữ liệu từ Google Sheet"""
+    data = get_sheet_data()
+    
+    if data:
+        return {
+            "status": "success",
+            "message": f"Kết nối thành công! Đã lấy được {len(data)} dòng dữ liệu.",
+            "data_preview": data[:3]  # Hiển thị thử 3 dòng đầu tiên để kiểm tra
+        }
+    else:
+        return {
+            "status": "error",
+            "message": "Không lấy được dữ liệu. Vui lòng kiểm tra lại quyền chia sẻ file hoặc tên file."
+        }
+    
 async def process_and_reply(sender_id: str, user_text: str):
     # 1. Gọi AI xử lý dựa trên dữ liệu Google Drive
     bot_reply = await get_rag_answer(user_text)
