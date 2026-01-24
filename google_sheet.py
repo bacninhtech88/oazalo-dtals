@@ -32,37 +32,35 @@ load_dotenv()
 #         return []
 
 
-import gspread
-import json
-import os
-from oauth2client.service_account import ServiceAccountCredentials
-
 def get_sheet_data():
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        
-        # 1. Kiểm tra xác thực
         creds_raw = os.getenv("GCP_CREDENTIALS_JSON")
+        
         if not creds_raw:
-            return [{"error": "Thieu biến môi trường GCP_CREDENTIALS_JSON"}]
-            
+            return "LOI: Bien moi truong GCP_CREDENTIALS_JSON dang trong"
+
         creds_json = json.loads(creds_raw)
+        
+        # DÒNG QUAN TRỌNG: In email thực tế đang chạy trên Render ra Log
+        current_email = creds_json.get('client_email')
+        print(f"--- KIEM TRA EMAIL: {current_email} ---")
+        
         creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
         client = gspread.authorize(creds)
 
-        # 2. Sử dụng ID chính xác từ ảnh của bạn
+        # ID Sheet của bạn
         SHEET_ID = "1MPL86dM26ypGQHCDDwN-eCL3kENvg8821dwRS7pYxgI"
         
-        # 3. Mở và lấy giá trị thô (Dùng get_all_values để tránh lỗi tiêu đề)
+        # Thử mở Sheet
         sheet = client.open_by_key(SHEET_ID).sheet1
-        data = sheet.get_all_values() 
-        
-        return data
-    except Exception as e:
-        # In lỗi cực kỳ chi tiết ra Log
-        print(f"--- LOI DOC SHEET: {str(e)} ---")
-        return []
+        return sheet.get_all_values()
 
+    except Exception as e:
+        # Ép kiểu string để Log Render bắt buộc phải hiện nội dung lỗi
+        error_msg = str(e)
+        print(f"--- LOI CHI TIET: {error_msg} ---")
+        return f"Error: {error_msg}"
 
 def search_warranty(machine_id):
     """Tìm kiếm thông tin bảo hành theo mã máy"""
