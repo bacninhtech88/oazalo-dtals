@@ -1,5 +1,5 @@
 # app.py
-from fastapi import FastAPI , Request, BackgroundTasks
+from fastapi import FastAPI , Request, BackgroundTasks, Query
 from fastapi.responses import HTMLResponse
 from ai_connect import chatgpt_connection
 from zalo_auth import zalo_oa_connection
@@ -11,6 +11,7 @@ from zalo_auth import send_zalo_message
 
 from google_sheet import get_sheet_data  # Import hàm từ file google_sheet.py
 
+from analytic_python import analyze_warranty_logic
 
 app = FastAPI()
 
@@ -98,7 +99,23 @@ async def check_sheet_connection():
             "status": "error",
             "message": "Không lấy được dữ liệu. Vui lòng kiểm tra lại quyền chia sẻ file hoặc tên file."
         }
-    
+
+@app.get("/check-analytic-python")
+async def check_analytic(q: str = Query(..., description="Câu hỏi test, ví dụ: tdrone123")):
+    """
+    Truy cập: /check-analytic-python?q=tdrone123
+    """
+    try:
+        result = analyze_warranty_logic(q)
+        return {
+            "status": "success",
+            "analysis": result
+        }
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+
+
 async def process_and_reply(sender_id: str, user_text: str):
     # 1. Gọi AI xử lý dựa trên dữ liệu Google Drive
     bot_reply = await get_rag_answer(user_text)
