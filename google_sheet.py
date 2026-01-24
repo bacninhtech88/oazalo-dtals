@@ -32,30 +32,35 @@ load_dotenv()
 #         return []
 
 
+import gspread
+import json
+import os
+from oauth2client.service_account import ServiceAccountCredentials
+
 def get_sheet_data():
     try:
-        # Giữ nguyên phần scope và credentials cũ
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds_json = json.loads(os.getenv("GCP_CREDENTIALS_JSON"))
+        
+        # 1. Kiểm tra xác thực
+        creds_raw = os.getenv("GCP_CREDENTIALS_JSON")
+        if not creds_raw:
+            return [{"error": "Thieu biến môi trường GCP_CREDENTIALS_JSON"}]
+            
+        creds_json = json.loads(creds_raw)
         creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
         client = gspread.authorize(creds)
 
-        # Sử dụng ID bạn đã xác nhận
+        # 2. Sử dụng ID chính xác từ ảnh của bạn
         SHEET_ID = "1MPL86dM26ypGQHCDDwN-eCL3kENvg8821dwRS7pYxgI"
         
-        # Mở Sheet bằng ID
+        # 3. Mở và lấy giá trị thô (Dùng get_all_values để tránh lỗi tiêu đề)
         sheet = client.open_by_key(SHEET_ID).sheet1
+        data = sheet.get_all_values() 
         
-        # Lấy toàn bộ giá trị thô để kiểm tra kết nối
-        raw_data = sheet.get_all_values()
-        
-        if raw_data:
-            print(f"Kết nối thành công! Đã thấy dữ liệu từ dòng 1: {raw_data[0]}")
-        return raw_data
-        
+        return data
     except Exception as e:
-        # In lỗi này ra Log của Render để xem lý do thực sự
-        print(f"LỖI KẾT NỐI THỰC TẾ: {str(e)}")
+        # In lỗi cực kỳ chi tiết ra Log
+        print(f"--- LOI DOC SHEET: {str(e)} ---")
         return []
 
 
