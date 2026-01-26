@@ -53,7 +53,7 @@ def get_sheet_data():
         SHEET_ID = "1MPL86dM26ypGQHCDDwN-eCL3kENvg8821dwRS7pYxgI"
         
         # Thử mở Sheet
-        sheet = client.open_by_key(SHEET_ID).sheet1
+        sheet = client.open_by_key(SHEET_ID).worksheet("Bảo hành")
         return sheet.get_all_values()
 
     except Exception as e:
