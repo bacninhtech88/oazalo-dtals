@@ -32,35 +32,57 @@ load_dotenv()
 #         return []
 
 
+# def get_sheet_data():
+#     try:
+#         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+#         creds_raw = os.getenv("GCP_CREDENTIALS_JSON")
+        
+#         if not creds_raw:
+#             return "LOI: Bien moi truong GCP_CREDENTIALS_JSON dang trong"
+
+#         creds_json = json.loads(creds_raw)
+        
+#         # DÒNG QUAN TRỌNG: In email thực tế đang chạy trên Render ra Log
+#         current_email = creds_json.get('client_email')
+#         print(f"--- KIEM TRA EMAIL: {current_email} ---")
+        
+#         creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
+#         client = gspread.authorize(creds)
+
+#         # ID Sheet của bạn
+#         SHEET_ID = "1MPL86dM26ypGQHCDDwN-eCL3kENvg8821dwRS7pYxgI"
+        
+#         # Thử mở Sheet
+#         sheet = client.open_by_key(SHEET_ID).worksheet("Bảo hành")
+#         return sheet.get_all_values()
+
+#     except Exception as e:
+#         # Ép kiểu string để Log Render bắt buộc phải hiện nội dung lỗi
+#         error_msg = str(e)
+#         print(f"--- LOI CHI TIET: {error_msg} ---")
+#         return f"Error: {error_msg}"
+
+
+# google_sheet.py
 def get_sheet_data():
     try:
-        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        creds_raw = os.getenv("GCP_CREDENTIALS_JSON")
-        
-        if not creds_raw:
-            return "LOI: Bien moi truong GCP_CREDENTIALS_JSON dang trong"
-
-        creds_json = json.loads(creds_raw)
-        
-        # DÒNG QUAN TRỌNG: In email thực tế đang chạy trên Render ra Log
-        current_email = creds_json.get('client_email')
-        print(f"--- KIEM TRA EMAIL: {current_email} ---")
-        
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
+        # ... (giữ nguyên phần auth) ...
         client = gspread.authorize(creds)
-
-        # ID Sheet của bạn
         SHEET_ID = "1MPL86dM26ypGQHCDDwN-eCL3kENvg8821dwRS7pYxgI"
         
-        # Thử mở Sheet
-        sheet = client.open_by_key(SHEET_ID).worksheet("Bảo hành")
-        return sheet.get_all_values()
+        # Thử lấy tất cả tên tab có trong file này
+        spreadsheet = client.open_by_key(SHEET_ID)
+        all_worksheets = [ws.title for ws in spreadsheet.worksheets()]
+        print(f"Danh sách các tab hiện có: {all_worksheets}")
 
+        # Mở tab 'Bảo hành'
+        sheet = spreadsheet.worksheet("Bảo hành")
+        return sheet.get_all_values()
     except Exception as e:
-        # Ép kiểu string để Log Render bắt buộc phải hiện nội dung lỗi
-        error_msg = str(e)
-        print(f"--- LOI CHI TIET: {error_msg} ---")
-        return f"Error: {error_msg}"
+        # In lỗi cụ thể: Ví dụ WorksheetNotFound
+        print(f"LỖI TẠI GOOGLE_SHEET.PY: {str(e)}")
+        return f"Lỗi: {str(e)}"
+
 
 def search_warranty(machine_id):
     """Tìm kiếm thông tin bảo hành theo mã máy"""
