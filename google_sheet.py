@@ -62,27 +62,37 @@ load_dotenv()
 #         print(f"--- LOI CHI TIET: {error_msg} ---")
 #         return f"Error: {error_msg}"
 
-
-# google_sheet.py
 def get_sheet_data():
     try:
-        # ... (giữ nguyên phần auth) ...
-        client = gspread.authorize(creds)
-        SHEET_ID = "1MPL86dM26ypGQHCDDwN-eCL3kENvg8821dwRS7pYxgI"
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
         
-        # Thử lấy tất cả tên tab có trong file này
+        # LẤY BIẾN TỪ RENDER
+        creds_raw = os.getenv("GCP_CREDENTIALS_JSON")
+        if not creds_raw:
+            return "Lỗi: Không tìm thấy biến môi trường GCP_CREDENTIALS_JSON"
+            
+        creds_json = json.loads(creds_raw)
+        
+        # ĐỊNH NGHĨA BIẾN CREDS Ở ĐÂY
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
+        client = gspread.authorize(creds)
+
+        SHEET_ID = "1MPL86dM26ypGQHCDDwN-eCL3kENvg8821dwRS7pYxgI"
         spreadsheet = client.open_by_key(SHEET_ID)
-        all_worksheets = [ws.title for ws in spreadsheet.worksheets()]
-        print(f"Danh sách các tab hiện có: {all_worksheets}")
 
-        # Mở tab 'Bảo hành'
-        sheet = spreadsheet.worksheet("Bảo hành")
-        return sheet.get_all_values()
+        # KIỂM TRA TÊN TAB THỰC TẾ
+        all_tabs = [ws.title for ws in spreadsheet.worksheets()]
+        print(f"Các tab hiện có: {all_tabs}")
+
+        # THỬ MỞ TAB 'Bảo hành'
+        try:
+            sheet = spreadsheet.worksheet("Bảo hành")
+            return sheet.get_all_values()
+        except:
+            return f"Không tìm thấy tab 'Bảo hành'. Các tab hiện có là: {all_tabs}"
+
     except Exception as e:
-        # In lỗi cụ thể: Ví dụ WorksheetNotFound
-        print(f"LỖI TẠI GOOGLE_SHEET.PY: {str(e)}")
-        return f"Lỗi: {str(e)}"
-
+        return f"Lỗi hệ thống: {str(e)}"
 
 def search_warranty(machine_id):
     """Tìm kiếm thông tin bảo hành theo mã máy"""
