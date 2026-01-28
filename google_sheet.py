@@ -2,6 +2,7 @@
 import gspread
 import json
 import os
+import traceback
 from oauth2client.service_account import ServiceAccountCredentials
 from dotenv import load_dotenv
 
@@ -62,37 +63,47 @@ load_dotenv()
 #         print(f"--- LOI CHI TIET: {error_msg} ---")
 #         return f"Error: {error_msg}"
 
+
 def get_sheet_data():
     try:
         scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
         
-        # LẤY BIẾN TỪ RENDER
+        # 1. Kiểm tra biến môi trường
         creds_raw = os.getenv("GCP_CREDENTIALS_JSON")
         if not creds_raw:
-            return "Lỗi: Không tìm thấy biến môi trường GCP_CREDENTIALS_JSON"
+            return "Lỗi: Biến GCP_CREDENTIALS_JSON đang trống hoặc chưa được cài trên Render."
             
-        creds_json = json.loads(creds_raw)
+        # 2. Thử giải mã JSON
+        try:
+            creds_json = json.loads(creds_raw)
+        except Exception as json_err:
+            return f"Lỗi định dạng JSON: {str(json_err)}. Hãy kiểm tra xem bạn có dán thiếu dấu ngoặc nào không."
         
-        # ĐỊNH NGHĨA BIẾN CREDS Ở ĐÂY
+        # 3. Xác thực
         creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
         client = gspread.authorize(creds)
 
+        # 4. Mở Spreadsheet
         SHEET_ID = "1MPL86dM26ypGQHCDDwN-eCL3kENvg8821dwRS7pYxgI"
-        spreadsheet = client.open_by_key(SHEET_ID)
+        try:
+            spreadsheet = client.open_by_key(SHEET_ID)
+        except Exception as open_err:
+            return f"Lỗi không mở được file Sheet (ID sai hoặc chưa share quyền): {str(open_err)}"
 
-        # KIỂM TRA TÊN TAB THỰC TẾ
-        all_tabs = [ws.title for ws in spreadsheet.worksheets()]
-        print(f"Các tab hiện có: {all_tabs}")
-
-        # THỬ MỞ TAB 'Bảo hành'
+        # 5. Mở tab 'Bảo hành'
         try:
             sheet = spreadsheet.worksheet("Bảo hành")
             return sheet.get_all_values()
-        except:
-            return f"Không tìm thấy tab 'Bảo hành'. Các tab hiện có là: {all_tabs}"
+        except gspread.exceptions.WorksheetNotFound:
+            # Nếu không tìm thấy, lấy danh sách tab để báo lỗi cho chuẩn
+            all_tabs = [ws.title for ws in spreadsheet.worksheets()]
+            return f"Không thấy tab 'Bảo hành'. Các tab hiện có là: {all_tabs}"
 
     except Exception as e:
-        return f"Lỗi hệ thống: {str(e)}"
+        # In chi tiết lỗi ra màn hình Console của Render
+        print("--- LỖI HỆ THỐNG CHI TIẾT ---")
+        traceback.print_exc()
+        return f"Lỗi chưa xác định: {type(e).__name__} - {str(e)}"
 
 def search_warranty(machine_id):
     """Tìm kiếm thông tin bảo hành theo mã máy"""
